@@ -1,7 +1,7 @@
 use std::cmp::Ordering;
 use crate::tournament_model::matching::Matching;
 
-#[derive(Default)]
+#[derive(Default,Debug)]
 /// # Player is player
 ///
 /// ## Ordering
@@ -47,13 +47,13 @@ impl Player {
         &mut self.match_win_percentage
     }
     pub fn opponent_match_win_percentage_mut(&mut self) -> &mut f64 {
-        &mut self.match_win_percentage
+        &mut self.opponent_match_win_percentage
     }
     pub fn game_win_percentage_mut(&mut self) -> &mut f64 {
-        &mut self.match_win_percentage
+        &mut self.game_win_percentage
     }
     pub fn opponent_game_win_percentage_mut(&mut self) -> &mut f64 {
-        &mut self.match_win_percentage
+        &mut self.opponent_game_win_percentage
     }
     pub fn matching_list_mut(&mut self) -> &mut Vec<Matching> {
         &mut self.matching_list
@@ -63,13 +63,13 @@ impl Player {
         self.match_win_percentage
     }
     pub fn opponent_match_win_percentage(&self) -> f64 {
-        self.match_win_percentage
+        self.opponent_match_win_percentage
     }
     pub fn game_win_percentage(&self) -> f64 {
-        self.match_win_percentage
+        self.game_win_percentage
     }
     pub fn opponent_game_win_percentage(&self) -> f64 {
-        self.match_win_percentage
+        self.opponent_game_win_percentage
     }
     pub fn matching_list(&self) -> &Vec<Matching> {
         &self.matching_list
@@ -229,11 +229,11 @@ fn test_player_construct() {
 fn test_add_matching() {
     // referenced: https://kirisamemagic.diarynote.jp/201401060210226433/
     let mut p = Player::new(0, "あ😁し😁は😁ら".to_string());
-    p.add_matching(Matching::new(1, 0, 0, 1, 2, 0, 0, false, false));
-    p.add_matching(Matching::new(2, 0, 0, 2, 1, 1, 0, false, false));
-    p.add_matching(Matching::new(3, 0, 0, 3, 2, 0, 1, false, false));
-    p.add_matching(Matching::new(4, 0, 0, 4, 0, 0, 0, false, true));
-    p.add_matching(Matching::new(5, 0, 0, 5, 0, 0, 2, false, false));
+    p.add_matching(Matching::new(0, 0, 1, 2, 0, 0, false, false));
+    p.add_matching(Matching::new(0, 0, 2, 1, 1, 0, false, false));
+    p.add_matching(Matching::new(0, 0, 3, 2, 0, 1, false, false));
+    p.add_matching(Matching::new(0, 0, 4, 0, 0, 0, false, true));
+    p.add_matching(Matching::new(0, 0, 5, 0, 0, 2, false, false));
     assert_eq!(p.matching_list[0].draw_count(), 0);
     assert_eq!(p.matching_list[1].win_count(), 1);
     assert!(!p.matching_list[3].is_valid());
@@ -243,11 +243,11 @@ fn test_add_matching() {
 fn test_points_calculation() {
     // referenced: https://kirisamemagic.diarynote.jp/201401060210226433/
     let mut p = Player::new(0, "あ😁し😁は😁ら".to_string());
-    p.add_matching(Matching::new(1, 0, 0, 1, 2, 0, 0, false, false));
-    p.add_matching(Matching::new(2, 0, 0, 2, 1, 1, 0, false, false));
-    p.add_matching(Matching::new(3, 0, 0, 3, 2, 0, 1, false, false));
-    p.add_matching(Matching::new(4, 0, 0, 4, 0, 0, 0, false, true));
-    p.add_matching(Matching::new(5, 0, 0, 5, 0, 0, 2, false, false));
+    p.add_matching(Matching::new(0, 0, 1, 2, 0, 0, false, false));
+    p.add_matching(Matching::new(0, 0, 2, 1, 1, 0, false, false));
+    p.add_matching(Matching::new(0, 0, 3, 2, 0, 1, false, false));
+    p.add_matching(Matching::new(0, 0, 4, 0, 0, 0, false, true));
+    p.add_matching(Matching::new(0, 0, 5, 0, 0, 2, false, false));
     p.calculate_points();
     p.calculate_opponent_match_win_percentages(&vec![0.800,0.067,0.500,0.667,0.000,0.867]);
     p.calculate_game_win_percentages();
@@ -261,11 +261,11 @@ fn test_points_calculation() {
 #[test]
 fn test_special_points() {
     let mut p = Player::new(0, "あ😁し😁は😁ら".to_string());
-    p.add_matching(Matching::new(1, 0, 0, 1, 2, 1, 0, false, false));
-    p.add_matching(Matching::new(2, 0, 0, 2, 1, 1, 0, true, false));
-    p.add_matching(Matching::new(3, 0, 0, 3, 2, 0, 1, false, true));
-    p.add_matching(Matching::no_opponent_new(4, 0, 0));
-    p.add_matching(Matching::dropped_new(5, 0, 0));
+    p.add_matching(Matching::new(0, 0, 1, 2, 1, 0, false, false));
+    p.add_matching(Matching::new(0, 0, 2, 1, 1, 0, true, false));
+    p.add_matching(Matching::new(0, 0, 3, 2, 0, 1, false, true));
+    p.add_matching(Matching::no_opponent_new(0, 0));
+    p.add_matching(Matching::dropped_new(0, 0));
     p.calculate_points();
     p.calculate_opponent_match_win_percentages(&vec![0.800,0.067,0.500,0.667,0.000,0.867]);
     p.calculate_game_win_percentages();

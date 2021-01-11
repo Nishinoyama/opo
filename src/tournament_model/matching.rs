@@ -1,9 +1,9 @@
 
-#[derive(Clone)]
+#[derive(Clone,Debug)]
 /// model of matching result
 pub struct Matching {
     /// uid of match
-    uid: usize,
+    // uid: usize,
     /// what round number does this match begin
     round_number: i32,
     /// id of player
@@ -27,22 +27,22 @@ pub struct Matching {
 }
 
 impl Matching {
-    pub fn new(uid: usize, round_number: i32, player_id: usize, opponent_id: usize, win_count: i32, draw_count: i32, lose_count: i32, player_withdraw: bool, opponent_withdraw: bool ) -> Self {
+    pub fn new(round_number: i32, player_id: usize, opponent_id: usize, win_count: i32, draw_count: i32, lose_count: i32, player_withdraw: bool, opponent_withdraw: bool ) -> Self {
         if player_id == opponent_id {
             panic!("player and opponent have same id!")
         }
-        Matching { uid, round_number, player_id, opponent_id, win_count, draw_count, lose_count, player_withdraw, opponent_withdraw, no_opponent: false, dropped: false }
+        Matching { round_number, player_id, opponent_id, win_count, draw_count, lose_count, player_withdraw, opponent_withdraw, no_opponent: false, dropped: false }
     }
     /// give to no opponent player
-    pub fn no_opponent_new(uid: usize, round_number: i32, player_id: usize ) -> Self {
-        Matching { uid, round_number, player_id, opponent_id: 0, win_count: 0, draw_count: 0, lose_count: 0, player_withdraw: false, opponent_withdraw: false, no_opponent: true, dropped: false }
+    pub fn no_opponent_new(round_number: i32, player_id: usize ) -> Self {
+        Matching { round_number, player_id, opponent_id: 0, win_count: 0, draw_count: 0, lose_count: 0, player_withdraw: false, opponent_withdraw: false, no_opponent: true, dropped: false }
     }
     /// give to dropped player
-    pub fn dropped_new(uid: usize, round_number: i32, player_id: usize ) -> Self {
-        Matching { uid, round_number, player_id, opponent_id: 0, win_count: 0, draw_count: 0, lose_count: 0, player_withdraw: true, opponent_withdraw: false, no_opponent: false, dropped: true }
+    pub fn dropped_new(round_number: i32, player_id: usize ) -> Self {
+        Matching { round_number, player_id, opponent_id: 0, win_count: 0, draw_count: 0, lose_count: 0, player_withdraw: true, opponent_withdraw: false, no_opponent: false, dropped: true }
     }
     pub fn rev(m: &Matching) -> Self {
-        Self::new(m.uid, m.round_number, m.opponent_id, m.player_id, m.lose_count, m.draw_count, m.win_count, m.opponent_withdraw, m.player_withdraw)
+        Self::new(m.round_number, m.opponent_id, m.player_id, m.lose_count, m.draw_count, m.win_count, m.opponent_withdraw, m.player_withdraw)
     }
     pub fn player_id(&self) -> usize {
         self.player_id
@@ -83,6 +83,9 @@ impl Matching {
     pub fn is_dropped(&self) -> bool {
         self.dropped
     }
+    pub fn is_reversible(&self) -> bool {
+        !self.dropped && !self.no_opponent
+    }
     pub fn matching_points(&self) -> i32 {
         if self.is_win() {
             3
@@ -99,54 +102,54 @@ impl Matching {
 
 #[test]
 fn test_is_avail() {
-    let m = Matching::new(1, 0, 0, 1, 10, 0, 10, false, false);
+    let m = Matching::new(0, 0, 1, 10, 0, 10, false, false);
     assert!( m.is_valid() );
-    let m = Matching::new(1, 0, 0, 1, 10, 0, 10, true, false);
+    let m = Matching::new(0, 0, 1, 10, 0, 10, true, false);
     assert!( !m.is_valid() );
-    let m = Matching::new(1, 0, 0, 1, 10, 0, 10, true, true);
+    let m = Matching::new(0, 0, 1, 10, 0, 10, true, true);
     assert!( !m.is_valid() );
-    let m = Matching::new(1, 0, 0, 1, 10, 0, 10, false, true);
+    let m = Matching::new(0, 0, 1, 10, 0, 10, false, true);
     assert!( !m.is_valid() );
 }
 
 #[test]
 fn test_result() {
-    let m = Matching::new(1, 0, 0, 1, 10, 0, 10, false, false);
+    let m = Matching::new(0, 0, 1, 10, 0, 10, false, false);
     assert!(m.is_draw());
     assert!(!m.is_win());
     assert!(!m.is_lose());
     assert_eq!(m.matching_points(), 1);
-    let m = Matching::new(1, 0, 0, 1, 10, 0, 5, false, false);
+    let m = Matching::new(0, 0, 1, 10, 0, 5, false, false);
     assert!(!m.is_draw());
     assert!(m.is_win());
     assert!(!m.is_lose());
     assert_eq!(m.matching_points(), 3);
-    let m = Matching::new(1, 0, 0, 1, 5, 0, 10, false, false);
+    let m = Matching::new(0, 0, 1, 5, 0, 10, false, false);
     assert!(!m.is_draw());
     assert!(!m.is_win());
     assert!(m.is_lose());
     assert_eq!(m.matching_points(), 0);
-    let m = Matching::new(1, 0, 0, 1, 10, 0, 10, true, false);
+    let m = Matching::new(0, 0, 1, 10, 0, 10, true, false);
     assert!(!m.is_draw());
     assert!(!m.is_win());
     assert!(m.is_lose());
     assert_eq!(m.matching_points(), 0);
-    let m = Matching::new(1, 0, 0, 1, 10, 0, 10, false, true);
+    let m = Matching::new(0, 0, 1, 10, 0, 10, false, true);
     assert!(!m.is_draw());
     assert!(m.is_win());
     assert!(!m.is_lose());
     assert_eq!(m.matching_points(), 3);
-    let m = Matching::new(1, 0, 0, 1, 10, 0, 10, true, true);
+    let m = Matching::new(0, 0, 1, 10, 0, 10, true, true);
     assert!(m.is_draw());
     assert!(!m.is_win());
     assert!(!m.is_lose());
     assert_eq!(m.matching_points(), 1);
-    let m = Matching::no_opponent_new(1,0,0);
+    let m = Matching::no_opponent_new(0,0);
     assert!(!m.is_draw());
     assert!(m.is_win());
     assert!(!m.is_lose());
     assert_eq!(m.matching_points(), 3);
-    let m = Matching::dropped_new(1,0,0);
+    let m = Matching::dropped_new(0,0);
     assert!(!m.is_draw());
     assert!(!m.is_win());
     assert!(m.is_lose());

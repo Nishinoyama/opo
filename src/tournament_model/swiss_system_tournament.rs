@@ -96,7 +96,7 @@ impl Tournament {
 
 }
 
-macro_rules! assert_ae {
+macro_rules! assert_ap {
     ($left:expr, $right:expr, $eps:expr $(,)?) => {
         assert!($left > $right - $eps);
     };
@@ -115,7 +115,7 @@ fn test_add_player() {
     for i in 0..10000 {
         assert_eq!(*t.players[i].name(), format!("{}abcd", i));
     }
-    assert_eq!(t.player_number, 100000);
+    assert_eq!(t.player_number, 10000);
 }
 
 #[test]
@@ -136,12 +136,6 @@ fn test_aggregate_matches() {
         Matching::no_opponent_new(2,2),
     ];
     t.aggregate_matches(m);
-    for p in &t.players {
-        println!("{:?}", p);
-        for m in p.matching_list() {
-            println!("\t{:?}", m);
-        }
-    }
     assert_eq!(t.players[0].points(), 6);
     assert_eq!(t.players[1].points(), 0);
     assert_eq!(t.players[2].points(), 3);
@@ -150,16 +144,16 @@ fn test_aggregate_matches() {
     assert_eq!(t.players[1].match_win_percentage(), 0.0);
     assert_eq!(t.players[2].match_win_percentage(), 0.5);
     assert_eq!(t.players[3].match_win_percentage(), 0.5);
-    assert_ae!(t.players[0].opponent_match_win_percentage(), 0.42, 0.01);
-    assert_ae!(t.players[1].opponent_match_win_percentage(), 1.00, 1e-5);
-    assert_ae!(t.players[2].opponent_match_win_percentage(), 0.50, 1e-5);
-    assert_ae!(t.players[3].opponent_match_win_percentage(), 0.50, 1e-5);
-    assert_ae!(t.players[0].game_win_percentage(), 0.75, 1e-5);
-    assert_ae!(t.players[1].game_win_percentage(), 0.25, 1e-5);
-    assert_ae!(t.players[2].game_win_percentage(), 0.00, 1e-5);
-    assert_ae!(t.players[3].game_win_percentage(), 0.625,1e-5);
-    assert_ae!(t.players[0].opponent_game_win_percentage(), 0.4375,1e-5);
-    assert_ae!(t.players[1].opponent_game_win_percentage(), 0.75,  1e-5);
-    assert_ae!(t.players[2].opponent_game_win_percentage(), 0.625, 1e-5);
-    assert_ae!(t.players[3].opponent_game_win_percentage(), 0.375, 1e-5);
+    assert_ap!(t.players[0].opponent_match_win_percentage(), 0.42, 0.01);
+    assert_ap!(t.players[1].opponent_match_win_percentage(), 1.00, 1e-5);
+    assert_ap!(t.players[2].opponent_match_win_percentage(), 0.50, 1e-5);
+    assert_ap!(t.players[3].opponent_match_win_percentage(), 0.50, 1e-5);
+    assert_ap!(t.players[0].game_win_percentage(), 0.75, 1e-5);
+    assert_ap!(t.players[1].game_win_percentage(), 0.25, 1e-5);
+    assert_ap!(t.players[2].game_win_percentage(), 0.00, 1e-5);
+    assert_ap!(t.players[3].game_win_percentage(), 0.625,1e-5);
+    assert_ap!(t.players[0].opponent_game_win_percentage(), 0.4375,1e-5);
+    assert_ap!(t.players[1].opponent_game_win_percentage(), 0.75,  1e-5);
+    assert_ap!(t.players[2].opponent_game_win_percentage(), 0.625, 1e-5);
+    assert_ap!(t.players[3].opponent_game_win_percentage(), 0.375, 1e-5);
 }

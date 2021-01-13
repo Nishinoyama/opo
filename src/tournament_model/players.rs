@@ -6,7 +6,7 @@ use crate::tournament_model::matching::Matching;
 ///
 /// ## Ordering
 ///
-/// 1. withdraw relation ( them who withdraw is `true` is Less )
+/// 1. dropping relation ( them who dropping is `true` is Less )
 /// 2. Point Greater
 /// 3. OpMatchWin Greater
 /// 4. GameWin Greater
@@ -17,8 +17,8 @@ pub struct Player{
     id: usize,
     /// the player's name
     name: String,
-    /// did Player withdraw on the tournament?
-    withdrew: bool,
+    /// did Player dropped on the tournament?
+    dropped: bool,
     /// points the player gained in matches
     points: i32,
     match_win_percentage: f64,
@@ -37,7 +37,7 @@ impl Player {
     }
     pub fn dummy(id: usize) -> Self {
         let mut player = Player::new(id, "!!DUMMY!!".to_string());
-        player.withdrew = true;
+        player.dropped = true;
         player
     }
     pub fn points_mut(&mut self) -> &mut i32 {
@@ -87,6 +87,10 @@ impl Player {
 
     pub fn add_matching(&mut self, matching: Matching) {
         self.matching_list.push(matching);
+    }
+
+    pub fn is_dropped(&self) -> bool {
+        self.dropped
     }
 
     pub fn initialize_points(&mut self) {
@@ -166,12 +170,27 @@ impl Player {
         }
     }
 
+    pub fn had_matched_id(&self, search_id: Option<usize>) -> bool {
+        let mut existed = false;
+        match search_id {
+            Some(id) =>
+                for matching in self.matching_list() {
+                    existed = existed || matching.opponent_id() == id;
+                },
+            None =>
+                for matching in self.matching_list() {
+                    existed = existed || matching.is_no_opponent();
+                }
+        }
+        existed
+    }
+
 }
 
 impl Ord for Player {
     fn cmp(&self, other: &Self) -> Ordering {
-        if self.withdrew ^ other.withdrew {
-            if self.withdrew {
+        if self.dropped ^ other.dropped {
+            if self.dropped {
                 Ordering::Less
             } else {
                 Ordering::Greater
@@ -206,7 +225,7 @@ impl PartialOrd for Player {
 
 impl PartialEq for Player {
     fn eq(&self, other: &Self) -> bool {
-        !(self.withdrew ^ other.withdrew) &&
+        !(self.dropped ^ other.dropped) &&
         self.points == other.points &&
         self.opponent_match_win_percentage == other.opponent_match_win_percentage &&
         self.game_win_percentage == other.game_win_percentage &&
@@ -222,7 +241,7 @@ fn test_player_construct() {
     let p = Player::new(0, "あ😁し😁は😁ら".to_string());
     assert_eq!(*p.name(), "あ😁し😁は😁ら".to_string());
     assert_eq!(p.id, 0);
-    assert!(!p.withdrew);
+    assert!(!p.dropped);
 }
 
 #[test]

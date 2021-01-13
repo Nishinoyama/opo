@@ -89,9 +89,21 @@ impl Tournament {
 
         // マッチ結果に基づき計算を行う
         self.aggregate_points();
-        // self.matching_list.calculate_player_points(&mut self.players);
-        // matching_lists::aggregate(players, matches);
 
+    }
+
+    /// return `Vec<Option<usize>>` whose `Some(n)` n-th element number has n-th id player's opponent i
+    /// if element is `None`, no-opponent or player is dropped (No matching)
+    pub fn matching_build(&self) -> Result<Vec<Option<usize>>, String> {
+        let mut player_permutation = Vec::with_capacity(self.player_number as usize);
+        for p in &self.players {
+            player_permutation.push(p);
+        }
+        crate::tournament_model::matching_algorithm::matching_build(&mut player_permutation)
+    }
+
+    pub fn player_number(&self) -> usize {
+        self.players.len()
     }
 
 }
@@ -156,4 +168,42 @@ fn test_aggregate_matches() {
     assert_ap!(t.players[1].opponent_game_win_percentage(), 0.75,  1e-5);
     assert_ap!(t.players[2].opponent_game_win_percentage(), 0.625, 1e-5);
     assert_ap!(t.players[3].opponent_game_win_percentage(), 0.375, 1e-5);
+}
+
+#[test]
+fn test_matching_build() {
+    let mut t: Tournament = Default::default();
+    for i in 0..20000 {
+        let p: Player = Player::new(i, format!("{}abcd", i));
+        t.add_player(p);
+    }
+
+    for _ in 0..19 {
+        let ol = t.matching_build().unwrap();
+        let mut mt = vec![false; t.players.len()];
+        let mut ml = Vec::new();
+        for i in 0..t.players.len() {
+            match ol[i] {
+                Some(n) => {
+                    assert_eq!(i, ol[n].unwrap());
+                },
+                None => ()
+            }
+        }
+        for (i,o) in ol.iter().enumerate() {
+            match o {
+                Some(n) => {
+                    if !mt[*n] {
+                        mt[i] = true;
+                        mt[*n] = true;
+                        ml.push(Matching::new(1,i,*n,1,0,0,false,false));
+                    }
+                },
+                None => {
+                    ml.push(Matching::no_opponent_new(1,i));
+                }
+            }
+        }
+        t.aggregate_matches(ml);
+    }
 }

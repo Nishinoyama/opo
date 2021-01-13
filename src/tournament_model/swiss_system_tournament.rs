@@ -108,12 +108,15 @@ impl Tournament {
 
 }
 
+/// assert approximately equal
 macro_rules! assert_ap {
     ($left:expr, $right:expr, $eps:expr $(,)?) => {
         assert!($left > $right - $eps);
+        assert!($left < $right + $eps);
     };
     ($left:expr, $right:expr, $eps:expr, $($arg:tt)?) => {
         assert!($left > $right - $eps, $arg);
+        assert!($left < $right + $eps, $arg);
     };
 }
 
@@ -159,7 +162,7 @@ fn test_aggregate_matches() {
     assert_ap!(t.players[0].opponent_match_win_percentage(), 0.42, 0.01);
     assert_ap!(t.players[1].opponent_match_win_percentage(), 1.00, 1e-5);
     assert_ap!(t.players[2].opponent_match_win_percentage(), 0.50, 1e-5);
-    assert_ap!(t.players[3].opponent_match_win_percentage(), 0.50, 1e-5);
+    assert_ap!(t.players[3].opponent_match_win_percentage(), 0.75, 1e-5);
     assert_ap!(t.players[0].game_win_percentage(), 0.75, 1e-5);
     assert_ap!(t.players[1].game_win_percentage(), 0.25, 1e-5);
     assert_ap!(t.players[2].game_win_percentage(), 0.00, 1e-5);

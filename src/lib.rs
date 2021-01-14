@@ -1,1 +1,1 @@
-mod tournament_model;
+pub mod tournament_model;

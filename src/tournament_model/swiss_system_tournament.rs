@@ -12,9 +12,9 @@ pub struct Tournament {
 
 impl Tournament {
     /// make up json file tournament data. name is `tournament_name`.json.
-    pub fn make_json() {
-        unimplemented!();
-    }
+    // pub fn make_json() {
+    //     unimplemented!();
+    // }
 
     pub fn add_player(&mut self, player: Player) {
         self.players.push(player);

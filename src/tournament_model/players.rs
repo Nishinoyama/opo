@@ -1,5 +1,6 @@
 use std::cmp::Ordering;
-use crate::tournament_model::matching::Matching;
+use super::matching::Matching;
+use crate::assert_ap;
 
 #[derive(Default,Debug)]
 /// # Player is player
@@ -39,24 +40,6 @@ impl Player {
         let mut player = Player::new(id, "!!DUMMY!!".to_string());
         player.dropped = true;
         player
-    }
-    pub fn points_mut(&mut self) -> &mut i32 {
-        &mut self.points
-    }
-    pub fn match_win_percentage_mut(&mut self) -> &mut f64 {
-        &mut self.match_win_percentage
-    }
-    pub fn opponent_match_win_percentage_mut(&mut self) -> &mut f64 {
-        &mut self.opponent_match_win_percentage
-    }
-    pub fn game_win_percentage_mut(&mut self) -> &mut f64 {
-        &mut self.game_win_percentage
-    }
-    pub fn opponent_game_win_percentage_mut(&mut self) -> &mut f64 {
-        &mut self.opponent_game_win_percentage
-    }
-    pub fn matching_list_mut(&mut self) -> &mut Vec<Matching> {
-        &mut self.matching_list
     }
 
     pub fn match_win_percentage(&self) -> f64 {
@@ -271,10 +254,8 @@ fn test_points_calculation() {
     p.calculate_opponent_match_win_percentages(&vec![0.800,0.067,0.500,0.667,0.000,0.867]);
     p.calculate_game_win_percentages();
     assert_eq!(p.points, 12);
-    assert!(p.opponent_match_win_percentage >= 0.590); // 0.591
-    assert!(p.opponent_match_win_percentage <= 0.592);
-    assert!(p.game_win_percentage >= 0.583); // 0.5833
-    assert!(p.game_win_percentage <= 0.584);
+    assert_ap!(p.opponent_match_win_percentage, 0.591, 0.001); // 0.591
+    assert_ap!(p.game_win_percentage, 0.5833, 0.0001); // 0.5833
 }
 
 #[test]
@@ -290,12 +271,9 @@ fn test_special_points() {
     p.calculate_game_win_percentages();
     p.calculate_opponent_game_win_percentages(&vec![0.800,0.067,0.500,0.667,0.000,0.867]);
     assert_eq!(p.points, 9);
-    assert!(p.opponent_match_win_percentage >= 0.332); // 0.3333
-    assert!(p.opponent_match_win_percentage <= 0.334);
-    assert!(p.game_win_percentage >= 0.776); // 0.777
-    assert!(p.game_win_percentage <= 0.778);
-    assert!(p.opponent_game_win_percentage >= 0.066); // 0.067
-    assert!(p.opponent_game_win_percentage <= 0.068);
+    assert_ap!(p.opponent_match_win_percentage, 0.333, 0.001); // 0.3333
+    assert_ap!(p.game_win_percentage, 0.777, 0.001); // 0.777
+    assert_ap!(p.opponent_game_win_percentage, 0.067, 0.001); // 0.777
 }
 
 #[test]

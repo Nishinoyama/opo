@@ -1,6 +1,4 @@
-use crate::tournament_model::matching::Matching;
-use crate::tournament_model::players::Player;
-use std::collections::BTreeSet;
+use super::players::Player;
 
 fn invert_left_shift( mut k: usize ) -> usize {
     let mut count = 0;

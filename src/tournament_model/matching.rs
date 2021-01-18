@@ -2,7 +2,7 @@
 #[derive(Clone,Debug)]
 /// model of matching result
 pub struct Matching {
-    /// uid of match
+    ///// uid of match
     // uid: usize,
     /// what round number does this match begin
     round_number: i32,

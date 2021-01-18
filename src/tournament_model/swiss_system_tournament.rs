@@ -1,5 +1,6 @@
-use crate::tournament_model::matching::Matching;
-use crate::tournament_model::players::Player;
+use super::matching::Matching;
+use super::players::Player;
+use crate::assert_ap;
 
 #[derive(Default)]
 pub struct Tournament {
@@ -106,18 +107,6 @@ impl Tournament {
         self.players.len()
     }
 
-}
-
-/// assert approximately equal
-macro_rules! assert_ap {
-    ($left:expr, $right:expr, $eps:expr $(,)?) => {
-        assert!($left > $right - $eps);
-        assert!($left < $right + $eps);
-    };
-    ($left:expr, $right:expr, $eps:expr, $($arg:tt)?) => {
-        assert!($left > $right - $eps, $arg);
-        assert!($left < $right + $eps, $arg);
-    };
 }
 
 #[test]

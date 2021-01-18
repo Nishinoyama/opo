@@ -1,7 +1,8 @@
-pub mod tournament_model;
-use tournament_model::swiss_system_tournament::Tournament;
-use tournament_model::players::Player;
-use tournament_model::matching::Matching;
+use opo::tournament_model::{
+    players::Player,
+    matching::Matching,
+    swiss_system_tournament::Tournament,
+};
 
 fn main() {
 }
@@ -10,4 +11,3 @@ fn main() {
 fn name() {
     assert!(true);
 }
-

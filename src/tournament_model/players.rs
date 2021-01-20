@@ -1,6 +1,5 @@
 use std::cmp::Ordering;
 use super::matching::Matching;
-use crate::assert_ap;
 
 #[derive(Default,Debug)]
 /// # Player is player
@@ -244,6 +243,7 @@ fn test_add_matching() {
 #[test]
 fn test_points_calculation() {
     // referenced: https://kirisamemagic.diarynote.jp/201401060210226433/
+    use crate::assert_ap;
     let mut p = Player::new(0, "あ😁し😁は😁ら".to_string());
     p.add_matching(Matching::new(0, 0, 1, 2, 0, 0, false, false));
     p.add_matching(Matching::new(0, 0, 2, 1, 1, 0, false, false));
@@ -260,6 +260,7 @@ fn test_points_calculation() {
 
 #[test]
 fn test_special_points() {
+    use crate::assert_ap;
     let mut p = Player::new(0, "あ😁し😁は😁ら".to_string());
     p.add_matching(Matching::new(0, 0, 1, 2, 1, 0, false, false));
     p.add_matching(Matching::new(0, 0, 2, 1, 1, 0, true, false));

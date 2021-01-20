@@ -1,6 +1,5 @@
 use super::matching::Matching;
 use super::players::Player;
-use crate::assert_ap;
 
 #[derive(Default)]
 pub struct Tournament {
@@ -124,6 +123,7 @@ fn test_add_player() {
 
 #[test]
 fn test_aggregate_matches() {
+    use crate::assert_ap;
     let mut t: Tournament = Default::default();
     for i in 0..4 {
         let p: Player = Player::new(i, format!("{}abcd", i));
@@ -165,12 +165,12 @@ fn test_aggregate_matches() {
 #[test]
 fn test_matching_build() {
     let mut t: Tournament = Default::default();
-    for i in 0..20000 {
+    for i in 0..200 {
         let p: Player = Player::new(i, format!("{}abcd", i));
         t.add_player(p);
     }
 
-    for _ in 0..19 {
+    for _ in 0..9 {
         let ol = t.matching_build().unwrap();
         let mut mt = vec![false; t.players.len()];
         let mut ml = Vec::new();

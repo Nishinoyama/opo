@@ -1,7 +1,7 @@
 use super::matching::Matching;
 use super::players::Player;
 
-#[derive(Default)]
+#[derive(Default, Debug)]
 pub struct Tournament {
     player_number: i32,
     // available_player_number: i32,

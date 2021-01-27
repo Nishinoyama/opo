@@ -1,14 +1,5 @@
 use super::players::Player;
 
-fn invert_left_shift( mut k: usize ) -> usize {
-    let mut count = 0;
-    while ( k & 1 ) != 1 {
-        count += 1;
-        k >>= 1;
-    }
-    count
-}
-
 pub fn matching_build(players: &mut Vec<&Player>) -> Result<Vec<Option<usize>>, String> {
 
     let mut matchable_players: Vec<&&Player> = players.iter().filter(|p| !p.is_dropped()).collect();
@@ -80,7 +71,7 @@ pub fn matching_build(players: &mut Vec<&Player>) -> Result<Vec<Option<usize>>, 
             if rb[rbn][rbb].1 {
                 let transition = (rbb<<1) - tmp_rbb as usize;
                 let lid = matchable_players[rbn - 1].id();
-                let rid = matchable_players[rbn - 1 + invert_left_shift(transition)].id();
+                let rid = matchable_players[rbn - 1 + transition.trailing_zeros() as usize].id();
                 if lid < matchable_number && rid < matchable_number {
                     matching_list[lid] = Some(rid);
                     matching_list[rid] = Some(lid);

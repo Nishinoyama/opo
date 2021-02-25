@@ -6,8 +6,3 @@ use opo::tournament_model::{
 
 fn main() {
 }
-
-#[test]
-fn name() {
-    assert!(true);
-}

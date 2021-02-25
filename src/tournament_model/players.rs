@@ -83,25 +83,22 @@ impl Player {
         self.opponent_match_win_percentage = 0.0;
     }
 
-    pub fn matched_round_number(&self) -> i32 {
-        let mut count = 0;
-        for matching in self.matching_list() {
-            if !matching.is_dropped() {
-                count += 1;
-            }
-        }
-        count
+    pub fn matched_round_number(&self) -> usize {
+        self.matching_list().into_iter()
+            .filter(|matching| !matching.is_dropped())
+            .count()
     }
 
     pub fn calculate_points(&mut self) {
-        self.points = 0;
-        for matching in &self.matching_list {
-            self.points += matching.matching_points();
-        }
+        self.points =
+            self.matching_list().into_iter()
+            .map(|matching| matching.matching_points())
+            .sum()
     }
 
     pub fn calculate_match_win_percentages(&mut self) {
-        self.match_win_percentage = self.points as f64/ self.matched_round_number() as f64 / 3.0;
+        self.match_win_percentage =
+            self.points as f64 / self.matched_round_number() as f64 / 3.0;
     }
 
     pub fn calculate_opponent_match_win_percentages(&mut self, players_mwp: &Vec<f64>) {
@@ -153,18 +150,14 @@ impl Player {
     }
 
     pub fn had_matched_id(&self, search_id: Option<usize>) -> bool {
-        let mut existed = false;
         match search_id {
             Some(id) =>
-                for matching in self.matching_list() {
-                    existed = existed || matching.opponent_id() == id;
-                },
+                self.matching_list().into_iter()
+                    .find(|matching| matching.opponent_id() == id).is_some(),
             None =>
-                for matching in self.matching_list() {
-                    existed = existed || matching.is_no_opponent();
-                }
+                self.matching_list().into_iter()
+                    .find(|matching| matching.is_no_opponent()).is_some(),
         }
-        existed
     }
 
 }

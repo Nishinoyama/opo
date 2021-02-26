@@ -43,9 +43,9 @@ pub fn matching_build(players: &mut Vec<&Player>) -> Result<Vec<Option<usize>>, 
                     let opponent = matchable_players[ppi];
                     let bbi = (bi >> 1) | (1 << pi);
                     let mut cost = player.points();
-                    let opponent_id = if ppi == usize::max_value() {
+                    let opponent_id = if opponent.id() != usize::max_value() {
                         cost -= opponent.points();
-                        Some(player.id())
+                        Some(opponent.id())
                     } else {
                         None
                     };
@@ -91,5 +91,61 @@ pub fn matching_build(players: &mut Vec<&Player>) -> Result<Vec<Option<usize>>, 
     }
 
     Err("No satisfying matching!".to_string())
+
+}
+
+pub fn matching_build_greed(players: &mut Vec<&Player>) -> Result<Vec<Option<usize>>, String> {
+
+    let mut matchable_players: Vec<&&Player> = players.iter().filter(|p| !p.is_dropped()).collect();
+    matchable_players.sort();
+    matchable_players.reverse();
+    let mut matching_list: Vec<Option<usize>> = vec![None; players.len()];
+    let mut res = matching_dfs(&mut matchable_players, 0, &mut matching_list);
+
+    if res.is_some() {
+        Ok(res.unwrap())
+    } else {
+        Err("No satisfying matching!".to_string())
+    }
+
+}
+
+fn matching_dfs(players: &mut Vec<&&Player>, player: usize, matched_list: &mut Vec<Option<usize>> ) -> Option<Vec<Option<usize>>> {
+
+    if player == players.len() {
+        return if matched_list.iter().filter(|&x| x.is_some()).count() >= players.len() - 1 {
+            Some(matched_list.clone())
+        } else {
+            None
+        }
+    }
+
+    let player_id = players.get(player).unwrap().id();
+    if matched_list.get(player_id).unwrap().is_some() {
+        return matching_dfs(players, player+1, matched_list);
+    }
+
+    for opponent in player+1..players.len() {
+        let opponent_id = players.get(opponent).unwrap().id();
+        if !players.get(player).unwrap().had_matched_id(Some(opponent_id)) && matched_list.get(opponent_id).unwrap().is_none() {
+            *matched_list.get_mut(player_id).unwrap() = Some(opponent_id);
+            *matched_list.get_mut(opponent_id).unwrap() = Some(player_id);
+            let res = matching_dfs(players, player+1, matched_list);
+            if res.is_some() {
+                return res;
+            }
+            *matched_list.get_mut(player_id).unwrap() = None;
+            *matched_list.get_mut(opponent_id).unwrap() = None;
+        }
+    }
+
+    if !players.get(player).unwrap().had_matched_id(None) {
+        let res = matching_dfs(players, player+1, matched_list);
+        if res.is_some() {
+            return res;
+        }
+    }
+
+    None
 
 }

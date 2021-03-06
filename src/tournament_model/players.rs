@@ -238,8 +238,8 @@ fn test_points_calculation() {
     p.calculate_opponent_match_win_percentages(&vec![0.800,0.067,0.500,0.667,0.000,0.867]);
     p.calculate_game_win_percentages();
     assert_eq!(p.points, 12);
-    assert_ap!(p.opponent_match_win_percentage, 0.591, 0.001); // 0.591
-    assert_ap!(p.game_win_percentage, 0.5833, 0.0001); // 0.5833
+    assert_ap!(p.opponent_match_win_percentage, 0.591, 0.001);
+    assert_ap!(p.game_win_percentage, 0.5833, 0.0001);
 }
 
 #[test]
@@ -256,9 +256,9 @@ fn test_special_points() {
     p.calculate_game_win_percentages();
     p.calculate_opponent_game_win_percentages(&vec![0.800,0.067,0.500,0.667,0.000,0.867]);
     assert_eq!(p.points, 9);
-    assert_ap!(p.opponent_match_win_percentage, 0.333, 0.001); // 0.3333
-    assert_ap!(p.game_win_percentage, 0.777, 0.001); // 0.777
-    assert_ap!(p.opponent_game_win_percentage, 0.067, 0.001); // 0.777
+    assert_ap!(p.opponent_match_win_percentage, 0.333, 0.001);
+    assert_ap!(p.game_win_percentage, 0.777, 0.001);
+    assert_ap!(p.opponent_game_win_percentage, 0.067, 0.001);
 }
 
 #[test]

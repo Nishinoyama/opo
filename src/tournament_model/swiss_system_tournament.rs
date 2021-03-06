@@ -69,22 +69,19 @@ impl Tournament {
 
     pub fn aggregate_matches(&mut self, matches: Vec<Matching>) {
         // そのラウンドでマッチ結果の集計、マッチしてない人の特定
-        let mut matched = Vec::with_capacity(self.player_number as usize);
-        for _ in 0..self.player_number {
-            matched.push(false);
-        }
+        let mut matched_id = vec![None; self.player_number as usize];
         for matching in matches {
-            if matching.is_reversible() {
-                let opponent_id = matching.opponent_id();
-                self.players[opponent_id].add_matching(Matching::rev(&matching));
-                matched[opponent_id] = true;
-            }
             let player_id = matching.player_id();
-            if matched[player_id] {
-                panic!("Duplicated Matching!: {:?}", matching);
+            let opponent_id = matching.opponent_id();
+            if matching.is_reversible() {
+                self.players[opponent_id].add_matching(Matching::rev(&matching));
+                matched_id[opponent_id] = Some(player_id);
+            }
+            if matched_id[player_id].is_some() {
+                panic!("Duplicated Matching!: \n{:?} and \n{:?}", matching, self.players[player_id].matching_list().last().unwrap());
             }
             self.players[player_id].add_matching(matching);
-            matched[player_id] = true;
+            matched_id[player_id] = Some(opponent_id);
         }
 
         // マッチ結果に基づき計算を行う

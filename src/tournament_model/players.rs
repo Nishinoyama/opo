@@ -96,57 +96,48 @@ impl Player {
             .sum()
     }
 
+    fn any_percentage(opponents_wp: Vec<f64>) -> f64 {
+        let count = opponents_wp.len();
+        let sum = opponents_wp.into_iter().sum::<f64>();
+        return if count > 0 {
+            sum / count as f64
+        } else {
+            0.0
+        }
+    }
+
+    fn matching_list_to_filtered_mapped_percentage_list<PercentageFn>(matching_list: &Vec<Matching>, mut percentage_fn: PercentageFn ) -> Vec<f64>
+    where PercentageFn: FnMut(&Matching) -> f64 {
+        matching_list.into_iter()
+            .filter(|matching| matching.is_valid())
+            .map(|matching| percentage_fn(matching))
+            .collect()
+    }
+
     pub fn calculate_match_win_percentages(&mut self) {
         self.match_win_percentage =
             self.points as f64 / self.matched_round_number() as f64 / 3.0;
     }
 
     pub fn calculate_opponent_match_win_percentages(&mut self, players_mwp: &Vec<f64>) {
-        let mut omwp = 0.0;
-        let mut count = 0;
-        for matching in self.matching_list() {
-            if matching.is_valid() {
-                omwp += f64::max( 1.0/3.0, players_mwp[matching.opponent_id()] );
-                count += 1;
-            }
-        }
-        self.opponent_match_win_percentage = if count > 0 {
-            omwp / count as f64
-        } else {
-            0.0
-        }
+        let omwp_list: Vec<f64> = Self::matching_list_to_filtered_mapped_percentage_list(self.matching_list(), |matching|{
+            f64::max(1.0/3.0, *players_mwp.get(matching.opponent_id()).unwrap())
+        });
+        self.opponent_match_win_percentage = Self::any_percentage(omwp_list);
     }
 
     pub fn calculate_game_win_percentages(&mut self) {
-        let mut gwp = 0.0;
-        let mut count = 0;
-        for matching in self.matching_list() {
-            if matching.is_valid() {
-                gwp += matching.game_win_percentage();
-                count += 1
-            }
-        }
-        self.game_win_percentage = if count > 0 {
-            gwp / count as f64
-        } else {
-            0.0
-        }
+        let gwp_list: Vec<f64> = Self::matching_list_to_filtered_mapped_percentage_list(self.matching_list(), |matching|{
+            matching.game_win_percentage()
+        });
+        self.game_win_percentage = Self::any_percentage(gwp_list);
     }
 
     pub fn calculate_opponent_game_win_percentages(&mut self, players_gwp: &Vec<f64>) {
-        let mut ogwp = 0.0;
-        let mut count = 0;
-        for matching in self.matching_list() {
-            if matching.is_valid() {
-                ogwp += players_gwp[matching.opponent_id()];
-                count += 1;
-            }
-        }
-        self.opponent_game_win_percentage = if count > 0 {
-            ogwp / count as f64
-        } else {
-            0.0
-        }
+        let ogwp_list: Vec<f64> = Self::matching_list_to_filtered_mapped_percentage_list(self.matching_list(), |matching|{
+            *players_gwp.get(matching.opponent_id()).unwrap()
+        });
+        self.opponent_game_win_percentage = Self::any_percentage(ogwp_list)
     }
 
     pub fn had_matched_id(&self, search_id: Option<usize>) -> bool {

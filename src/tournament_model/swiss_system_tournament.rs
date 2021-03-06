@@ -95,11 +95,11 @@ impl Tournament {
     /// return `Vec<Option<usize>>` whose `Some(n)` n-th element number has n-th id player's opponent i
     /// if element is `None`, no-opponent or player is dropped (No matching)
     pub fn matching_build(&self) -> Result<Vec<Option<usize>>, String> {
-        let mut player_permutation = Vec::with_capacity(self.player_number as usize);
-        for p in &self.players {
-            player_permutation.push(p);
-        }
-        crate::tournament_model::matching_algorithm::matching_build(&mut player_permutation)
+        crate::tournament_model::matching_algorithm::matching_build(&self.players)
+    }
+
+    pub fn greedy_matching_build(&self) -> Result<Vec<Option<usize>>, String> {
+        crate::tournament_model::matching_algorithm::matching_build_greed(&self.players)
     }
 
     pub fn player_number(&self) -> usize {

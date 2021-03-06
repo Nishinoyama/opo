@@ -1,13 +1,12 @@
 use super::players::Player;
+use itertools::Itertools;
 
-pub fn matching_build(players: &mut Vec<&Player>) -> Result<Vec<Option<usize>>, String> {
+pub fn matching_build(players: &Vec<Player>) -> Result<Vec<Option<usize>>, String> {
 
-    let mut matchable_players: Vec<&&Player> = players.iter().filter(|p| !p.is_dropped()).collect();
-    matchable_players.sort();
-    matchable_players.reverse();
-    let dummy_player = &&Player::dummy(usize::max_value());
+    let mut matchable_players = filter_sorted_matchable_players(players);
+    let dummy_player = Player::dummy(usize::max_value());
     if matchable_players.len() % 2 == 1 {
-        matchable_players.push(dummy_player);
+        matchable_players.push(&dummy_player);
     }
     let matchable_number: usize = matchable_players.len();
 
@@ -62,7 +61,7 @@ pub fn matching_build(players: &mut Vec<&Player>) -> Result<Vec<Option<usize>>, 
         // rollback
         let mut matching_list = vec![None; players.len()];
         let mut rbn = matchable_number;
-        let mut rbb:usize = 0;
+        let mut rbb: usize = 0;
         let matching_success = loop {
             let tmp_rbb = rb[rbn][rbb].0;
             if tmp_rbb < 0 {
@@ -94,13 +93,11 @@ pub fn matching_build(players: &mut Vec<&Player>) -> Result<Vec<Option<usize>>, 
 
 }
 
-pub fn matching_build_greed(players: &mut Vec<&Player>) -> Result<Vec<Option<usize>>, String> {
+pub fn matching_build_greed(players: &Vec<Player>) -> Result<Vec<Option<usize>>, String> {
 
-    let mut matchable_players: Vec<&&Player> = players.iter().filter(|p| !p.is_dropped()).collect();
-    matchable_players.sort();
-    matchable_players.reverse();
+    let matchable_players = filter_sorted_matchable_players(players);
     let mut matching_list: Vec<Option<usize>> = vec![None; players.len()];
-    let mut res = matching_dfs(&mut matchable_players, 0, &mut matching_list);
+    let res = matching_dfs(&matchable_players, 0, &mut matching_list);
 
     if res.is_some() {
         Ok(res.unwrap())
@@ -110,10 +107,10 @@ pub fn matching_build_greed(players: &mut Vec<&Player>) -> Result<Vec<Option<usi
 
 }
 
-fn matching_dfs(players: &mut Vec<&&Player>, player: usize, matched_list: &mut Vec<Option<usize>> ) -> Option<Vec<Option<usize>>> {
+fn matching_dfs(players: &Vec<&Player>, player: usize, matched_list: &mut Vec<Option<usize>> ) -> Option<Vec<Option<usize>>> {
 
     if player == players.len() {
-        return if matched_list.iter().filter(|&x| x.is_some()).count() >= players.len() - 1 {
+        return if matched_list.iter().filter(|x| x.is_some()).count() >= players.len() - 1 {
             Some(matched_list.clone())
         } else {
             None
@@ -148,4 +145,11 @@ fn matching_dfs(players: &mut Vec<&&Player>, player: usize, matched_list: &mut V
 
     None
 
+}
+
+pub fn filter_sorted_matchable_players(players: &Vec<Player>) -> Vec<&Player> {
+   players.into_iter()
+        .filter(|p| !p.is_dropped())
+        .sorted().rev()
+        .collect::<Vec<&Player>>()
 }

@@ -165,30 +165,37 @@ fn test_aggregate_matches() {
 #[test]
 fn test_matching_build() {
     let mut t: Tournament = Default::default();
-    for i in 0..200 {
+    for i in 0..2000 {
         let p: Player = Player::new(i, format!("{}abcd", i));
         t.add_player(p);
     }
 
-    for _ in 0..9 {
+    for _ in 0..20 {
         let ol = t.matching_build().unwrap();
         let mut mt = vec![false; t.players.len()];
         let mut ml = Vec::new();
+
+        // test matching lists are symmetric and no previous matching duplication
         for i in 0..t.players.len() {
-            match ol[i] {
+            match *ol.get(i).unwrap() {
                 Some(n) => {
-                    assert_eq!(i, ol[n].unwrap());
+                    assert_eq!(i, ol.get(n).unwrap().unwrap());
+                    assert!(!t.players.get(i).unwrap().had_matched_id(Some(n)));
                 },
-                None => ()
+                None => {
+                    assert!(!t.players.get(i).unwrap().had_matched_id(None));
+                },
             }
         }
-        for (i,o) in ol.iter().enumerate() {
+
+        // make sample of results of matches
+        for (i,o) in ol.into_iter().enumerate() {
             match o {
                 Some(n) => {
-                    if !mt[*n] {
+                    if !mt[n] {
                         mt[i] = true;
-                        mt[*n] = true;
-                        ml.push(Matching::new(1,i,*n,1,0,0,false,false));
+                        mt[n] = true;
+                        ml.push(Matching::new(1,i,n,1,0,0,false,false));
                     }
                 },
                 None => {
@@ -196,6 +203,53 @@ fn test_matching_build() {
                 }
             }
         }
+
+        t.aggregate_matches(ml);
+    }
+}
+
+#[test]
+fn test_greedy_matching_build() {
+    let mut t: Tournament = Default::default();
+    for i in 0..2000 {
+        let p: Player = Player::new(i, format!("{}abcd", i));
+        t.add_player(p);
+    }
+
+    for _ in 0..20 {
+        let ol = t.greedy_matching_build().unwrap();
+        let mut mt = vec![false; t.players.len()];
+        let mut ml = Vec::new();
+
+        // test matching lists are symmetric and no previous matching duplication
+        for i in 0..t.players.len() {
+            match *ol.get(i).unwrap() {
+                Some(n) => {
+                    assert_eq!(i, ol.get(n).unwrap().unwrap());
+                    assert!(!t.players.get(i).unwrap().had_matched_id(Some(n)));
+                },
+                None => {
+                    assert!(!t.players.get(i).unwrap().had_matched_id(None));
+                },
+            }
+        }
+
+        // make sample of results of matches
+        for (i,o) in ol.into_iter().enumerate() {
+            match o {
+                Some(n) => {
+                    if !mt[n] {
+                        mt[i] = true;
+                        mt[n] = true;
+                        ml.push(Matching::new(1,i,n,1,0,0,false,false));
+                    }
+                },
+                None => {
+                    ml.push(Matching::no_opponent_new(1,i));
+                }
+            }
+        }
+
         t.aggregate_matches(ml);
     }
 }
